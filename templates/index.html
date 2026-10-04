@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meeting Action-Item Extractor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>AI Meeting Action-Item Extractor</h1>
+        <p>Convert meeting transcripts into structured action items.</p>
+    </header>
+
+    <section class="card">
+        <h2>Upload or Paste Meeting Transcript</h2>
+        <form id="extractForm">
+            <label for="file">Upload .txt transcript</label>
+            <input type="file" id="file" name="file" accept=".txt">
+
+            <div class="or">OR</div>
+
+            <label for="transcript">Paste transcript</label>
+            <textarea id="transcript" name="transcript" rows="12"
+                placeholder="Example:
+Anita: We need to finalize the project report by 10/10/2026.
+Rahul: I will prepare the report and send it to the team.
+Priya: Please review the final report by Friday."></textarea>
+
+            <button type="submit">Extract Action Items</button>
+        </form>
+    </section>
+
+    <section class="card hidden" id="resultsCard">
+        <div class="results-header">
+            <h2>Extracted Results</h2>
+            <span id="count"></span>
+        </div>
+        <div id="message"></div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Owner</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Confidence</th>
+                        <th>Validation</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+const form = document.getElementById("extractForm");
+const card = document.getElementById("resultsCard");
+const body = document.getElementById("resultsBody");
+const count = document.getElementById("count");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    message.textContent = "Extracting action items...";
+    card.classList.remove("hidden");
+    body.innerHTML = "";
+
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch("/extract", {
+            method: "POST",
+            body: formData
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+            message.textContent = data.error || "Something went wrong.";
+            return;
+        }
+
+        count.textContent = `${data.count} item(s)`;
+        message.textContent = "";
+
+        data.items.forEach(item => {
+            const row = document.createElement("tr");
+            const warnings = item.warnings.length
+                ? item.warnings.join(", ")
+                : "Valid";
+
+            row.innerHTML = `
+                <td>${escapeHtml(item.task)}</td>
+                <td>${escapeHtml(item.owner)}</td>
+                <td>${escapeHtml(item.deadline)}</td>
+                <td>${escapeHtml(item.status)}</td>
+                <td>${Math.round(item.confidence * 100)}%</td>
+                <td>${escapeHtml(warnings)}</td>
+            `;
+            body.appendChild(row);
+        });
+    } catch (error) {
+        message.textContent = "Unable to connect to the server.";
+    }
+});
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+</script>
+</body>
+</html>
