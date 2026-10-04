@@ -1,0 +1,19 @@
+[
+  {
+    "transcript": "Anita: We need to finalize the project report by 10/10/2026.\nRahul: I will prepare the report and send it to the team.\nPriya: Please review the final report by Friday.\nAnita: We also need to schedule the client demo next week.",
+    "action_items": [
+      {"task": "finalize the project report", "owner": "Anita", "deadline": "10/10/2026"},
+      {"task": "prepare the report and send it to the team", "owner": "Rahul", "deadline": null},
+      {"task": "review the final report", "owner": "Priya", "deadline": "Friday"},
+      {"task": "schedule the client demo", "owner": "Anita", "deadline": "next week"}
+    ]
+  },
+  {
+    "transcript": "Manager: Rahul will update the presentation by 15/10/2026.\nRahul: I will also test the demo before Thursday.\nNeha: Please send the meeting notes to everyone.",
+    "action_items": [
+      {"task": "update the presentation", "owner": "Rahul", "deadline": "15/10/2026"},
+      {"task": "test the demo", "owner": "Rahul", "deadline": "Thursday"},
+      {"task": "send the meeting notes to everyone", "owner": "Neha", "deadline": null}
+    ]
+  }
+]
